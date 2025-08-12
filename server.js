@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Firebase Admin SDK باستخدام المتغير البيئي بدل الملف
+// تهيئة Firebase باستخدام متغير البيئة
 admin.initializeApp({
   credential: admin.credential.cert(JSON.parse(process.env.SERVICE_ACCOUNT))
 });
@@ -17,26 +17,25 @@ const db = admin.firestore();
 const LOCKER_LINKS = [
   "https://locked4.com/cl/i/x6e64r",
   "https://appslocked.com/cl/i/x6e64r",
-  "https://locked3.com/cl/i/sf89d4c",
-  "https://locked4.com/cl/i/o6v589m",
+  "https://locked3.com/cl/i/sf89v4c",
+  "https://locked4.com/cl/i/a6v5682",
   "https://appslocked.com/cl/i/ne9n9m"
 ];
 
-// بدء العرض
+// نقطة البداية
 app.post("/start-offer", async (req, res) => {
   const { username, offerIndex } = req.body;
-  
   if (!username || offerIndex === undefined) {
     return res.status(400).json({ error: "Missing username or offerIndex" });
   }
 
   const token = crypto.randomBytes(16).toString("hex");
-  const offerUrl = ${LOCKER_LINKS[offerIndex]}?subid=${token};
+  const offerUrl = `${LOCKER_LINKS[offerIndex]}?subid=${token}`;
 
-  // حفظ في قاعدة البيانات
-  await db.collection("offers").doc(token).set({
+  await db.collection("offers").add({
     username,
     offerIndex,
+    token,
     createdAt: admin.firestore.FieldValue.serverTimestamp()
   });
 
